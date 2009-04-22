@@ -6,6 +6,11 @@ require "#{File.dirname(__FILE__)}/app_root/config/environment"
 require 'test_help'
 require 'action_view/test_case' # Load additional test classes not done automatically by < Rails 2.2.2
 
+#allow to be run in test fold ala TextMate
+Dir["../lib/*"].each do |f|  
+ require File.join( File.dirname(__FILE__), f )
+end
+
 # Undo changes to RAILS_ENV
 silence_warnings {RAILS_ENV = ENV['RAILS_ENV']}
 
