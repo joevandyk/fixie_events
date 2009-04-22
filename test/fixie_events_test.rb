@@ -1,8 +1,11 @@
 require 'test_helper'
 
 class FixieEventsTest < ActiveSupport::TestCase
-  # Replace this with your real tests.
-  test "the truth" do
-    assert true
+  def test_events
+    assert Event.all.blank?
+  end
+
+  def test_this
+    assert 1 == 1
   end
 end
