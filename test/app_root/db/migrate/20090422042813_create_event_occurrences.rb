@@ -1,8 +1,11 @@
 class CreateEventOccurrences < ActiveRecord::Migration
   def self.up
     create_table :event_occurrences do |t|
-
-      t.timestamps
+       t.integer  :event_id
+       t.string   :name
+       t.datetime :start_at
+       t.time     :start_at
+       t.timestamps
     end
   end
 
