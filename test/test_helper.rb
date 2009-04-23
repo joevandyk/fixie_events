@@ -11,6 +11,9 @@ Dir["../lib/*"].each do |f|
  require File.join( File.dirname(__FILE__), f )
 end
 
+$: << File.join(File.dirname(__FILE__), "..", "vendor", "shoulda", "lib")
+require File.join( File.dirname(__FILE__), "..", "vendor", "shoulda", "init" )
+
 # Undo changes to RAILS_ENV
 silence_warnings {RAILS_ENV = ENV['RAILS_ENV']}
 

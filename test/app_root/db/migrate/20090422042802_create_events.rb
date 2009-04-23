@@ -4,6 +4,7 @@ class CreateEvents < ActiveRecord::Migration
       t.datetime   :start_at
       t.datetime   :end_at
       t.datetime   :last_generated_event
+      t.datetime   :events_end_at
       t.boolean    :repeat_monthly
       t.string     :name
       t.belongs_to :repeat_iterval
