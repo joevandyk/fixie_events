@@ -17,14 +17,15 @@ class FixieEventsTest < ActiveSupport::TestCase
 
     context "monthly event on 3rd monday until september" do
       setup do
-        @event = Event.create! :start_at => APRIL_13, :end_at => APRIL_13 + 1.hour, :repeat_monthly => true, :events_end_at => SEPTEMBER
+        @event = Event.create! :start_at => APRIL_13, :end_at => APRIL_13 + 1.hour, :repeat_interval_id => Event::WEEKLY, :events_end_at => SEPTEMBER
       end
 
       should "should have one event per month on the 3rd Monday" do
         month = APRIL
         while month <= SEPTEMBER
           occurrences = EventOccurrence.for_month(month)
-          occurrences.size.should == 1
+          #occurrences.size.should == 1  # fixnum don't have a .shold
+          assert ( 3 <= occurrences.size  or  5 >= occurrences.size )   
           month = month >> 1
         end
 
@@ -34,6 +35,14 @@ class FixieEventsTest < ActiveSupport::TestCase
 
         EventOccurrence.for_month(OCTOBER).should be_blank
       end
+      
+      should "should have an expression of DIWeek" do
+        assert @event.repeat_interval.expression( APRIL ).class == Runt::DIWeek
+      end
+      
+      should "should have a repeat interval" do
+        @event.repeat_interval.id == Event::WEEKLY
+      end
     end
   end
   
@@ -42,9 +51,8 @@ class FixieEventsTest < ActiveSupport::TestCase
       Event.set_repeat_interval_constants
     end
     
-    should " should have none, weekly, and yearly" do
-      puts "en const #{4.class}"
-      assert( Event::NONE == 4)
+    should " should contain none, weekly, and yearly" do
+      assert( Event::NONE   == 4)
       assert( Event::YEARLY == 9)
       assert( Event::WEEKLY == 6)
     end

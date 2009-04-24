@@ -1,6 +1,7 @@
 class Event < ActiveRecord::Base
   has_many     :occurrences, :class_name => "EventOccurrence", :dependent => :destroy
-  belongs_to   :repeats,     :class_name => "RepeatInterval"
+  belongs_to   :repeat_interval
+                                             
   after_update :update_occurrences
 
   def repeats?

@@ -56,7 +56,7 @@ class EventOccurrence < ActiveRecord::Base
 
   def self.occurrences_for_repeating_event event, start_at, end_at=nil
     # Setup repeating runt expression
-    s = event.repeat_interval.expression
+    s = event.repeat_interval.expression( event.start_at )
     
     # If ranged end date
     if end_at

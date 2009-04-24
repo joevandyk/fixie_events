@@ -7,7 +7,7 @@ class CreateEvents < ActiveRecord::Migration
       t.datetime   :events_end_at
       t.boolean    :repeat_monthly
       t.string     :name
-      t.belongs_to :repeat_iterval
+      t.belongs_to :repeat_interval
 
       t.timestamps
     end

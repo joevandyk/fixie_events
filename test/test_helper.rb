@@ -5,6 +5,8 @@ ENV['RAILS_ENV'] ||= 'in_memory'
 require "#{File.dirname(__FILE__)}/app_root/config/environment"
 require 'test_help'
 require 'action_view/test_case' # Load additional test classes not done automatically by < Rails 2.2.2
+require 'rubygems'
+require 'runt'
 
 #allow to be run in test fold ala TextMate
 Dir["../lib/*"].each do |f|  

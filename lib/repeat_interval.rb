@@ -1,24 +1,23 @@
 class RepeatInterval < ActiveRecord::Base
   has_many :events
 
-  def expression
-    send( self.abrev.downcase )
+  def expression start_date
+    send( abrev.downcase.to_sym, start_date )
   end
-  
   
   def self.options_for_select
     find( :all ).collect{ |ri| [ri.name, ri.abrev] }
   end
-private
-  def self.weekend date
+  
+  def weekend date
     Runt::REWeek.new( Runt::Saturday, Runt::Sunday)
   end
   
-  def self.weekly date
+  def weekly date
     Runt::DIWeek.new(date.wday)                  
   end
   
-  def self.weekday date
+  def weekday date
     Runt::DIWeekday.new(date.wday)                  
   end
 

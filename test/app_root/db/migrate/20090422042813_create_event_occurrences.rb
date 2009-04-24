@@ -5,6 +5,7 @@ class CreateEventOccurrences < ActiveRecord::Migration
        t.string   :name
        t.datetime :start_at
        t.time     :start_at
+       t.time     :end_at
        t.timestamps
     end
   end
