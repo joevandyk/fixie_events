@@ -36,6 +36,19 @@ class FixieEventsTest < ActiveSupport::TestCase
       end
     end
   end
+  
+  context "Event repeating constants" do
+    setup do
+      Event.set_repeat_interval_constants
+    end
+    
+    should " should have none, weekly, and yearly" do
+      puts "en const #{4.class}"
+      assert( Event::NONE == 4)
+      assert( Event::YEARLY == 9)
+      assert( Event::WEEKLY == 6)
+    end
+  end
 end
 
 =begin

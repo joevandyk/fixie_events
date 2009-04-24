@@ -34,8 +34,8 @@ class Event < ActiveRecord::Base
   
   
   def self.set_repeat_interval_constants
-    RepeatInterval.find( :all ) do |ri|
+    RepeatInterval.find( :all ).each do |ri|
       Event.const_set ri.abrev.upcase, ri.id
-    end rescue 'Puts run recurring even migrations'
+    end rescue 'Run recurring even migrations'
   end
 end
