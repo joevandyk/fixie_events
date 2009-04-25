@@ -55,7 +55,6 @@ class FixieEventsTest < ActiveSupport::TestCase
       
       should "be repeating" do
         assert @event.repeats?
-        puts "num occ #{@event.occurrences.size}"
       end
       
       should "should exist on the first monday some wednesday and much later on friday" do
