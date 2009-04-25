@@ -27,16 +27,18 @@ class FixieEventsTest < ActiveSupport::TestCase
         month = APRIL
         while month <= SEPTEMBER
           occurrences = EventOccurrence.for_month(month)
-          #occurrences.size.should == 1  # fixnum don't have a .should
           assert ( 3 <= occurrences.size  or  5 >= occurrences.size )   
           month = month >> 1
         end
-
-        @event.occurrences[0].start_at.should == DateTime.new(2009, 4, 20)
-        @event.occurrences[1].start_at.should == DateTime.new(2009, 5, 18)
-        @event.occurrences[2].start_at.should == DateTime.new(2009, 6, 15)
         
-        EventOccurrence.for_month(OCTOBER).should be_blank
+        { 1 => DateTime.new(2009, 4, 20),
+          5 => DateTime.new(2009, 5, 18),
+          9 => DateTime.new(2009, 6, 15)
+        }.each do |occurrence_id, date|
+          assert_occurrence_at_date occurrence_id, date
+        end
+        
+        assert 0 == EventOccurrence.for_month(OCTOBER).size, "october out of range"
       end
       
       should "should have an expression of DIWeek" do
@@ -63,11 +65,9 @@ class FixieEventsTest < ActiveSupport::TestCase
         { 0 => APRIL_13,
           4 => WED_APR_22,
           8 => FRI_MAY_1  
-        }.each do |occurence, date|
-          start_date =   @event.occurrences[occurence].start_at.to_date()
-          assert start_date == date,
-                 "#{occurence} occurence #{start_date.strftime('%m/%d/%y')} didn't match #{date.strftime( '%m/%d/%y')}"
-        end
+        }.each do |occurrence_id, date|
+          assert_occurrence_at_date occurrence_id, date
+         end
       
       end
     end # m w f
@@ -84,6 +84,13 @@ class FixieEventsTest < ActiveSupport::TestCase
       assert( Event::WEEKLY == 6)
     end
   end
+  
+  
+  def assert_occurrence_at_date o, date
+    start_date =   @event.occurrences[o].start_at.to_date()
+    assert start_date == date,
+           " occurrence[#{o}] #{start_date.strftime('%m/%d/%y')} didn't match #{date.strftime( '%m/%d/%y')}"
+  end    
 end
 
 =begin
