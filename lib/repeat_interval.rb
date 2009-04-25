@@ -16,11 +16,11 @@ class RepeatInterval < ActiveRecord::Base
   end
    
   def daily
-    
+    REWeek.new( Sun, Sat )
   end
     
   def weekend date
-    Runt::REWeek.new( Runt::Saturday, Runt::Sunday)
+    REWeek.new( Sat, Sun )
   end
   
   def weekly date
