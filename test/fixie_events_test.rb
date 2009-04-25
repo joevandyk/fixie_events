@@ -7,6 +7,9 @@ class FixieEventsTest < ActiveSupport::TestCase
   MARCH_29  = DateTime.new(2009, 3, 29, 19, 30)
   APRIL_19  = DateTime.new(2009, 4, 19)
   APRIL_13  = DateTime.new(2009, 4, 13)
+  WED_APR_22= DateTime.new(2009, 4, 22)
+  MAY       = DateTime.new(2009, 5)
+  FRI_MAY_1 = DateTime.new(2009, 5, 1)
   SEPTEMBER = DateTime.new(2009, 9, 30)
   OCTOBER   = DateTime.new(2009, 10)
 
@@ -24,7 +27,7 @@ class FixieEventsTest < ActiveSupport::TestCase
         month = APRIL
         while month <= SEPTEMBER
           occurrences = EventOccurrence.for_month(month)
-          #occurrences.size.should == 1  # fixnum don't have a .shold
+          #occurrences.size.should == 1  # fixnum don't have a .should
           assert ( 3 <= occurrences.size  or  5 >= occurrences.size )   
           month = month >> 1
         end
@@ -32,7 +35,7 @@ class FixieEventsTest < ActiveSupport::TestCase
         @event.occurrences[0].start_at.should == DateTime.new(2009, 4, 20)
         @event.occurrences[1].start_at.should == DateTime.new(2009, 5, 18)
         @event.occurrences[2].start_at.should == DateTime.new(2009, 6, 15)
-
+        
         EventOccurrence.for_month(OCTOBER).should be_blank
       end
       
@@ -44,6 +47,31 @@ class FixieEventsTest < ActiveSupport::TestCase
         @event.repeat_interval.id == Event::WEEKLY
       end
     end
+  
+    context "mon wed fri " do
+      setup do
+        @event = Event.create! :start_at => APRIL_13, :end_at => APRIL_13 + 1.hour, :repeat_interval_id => Event::MON_WED_FRI, :events_end_at => MAY
+      end
+      
+      should "be repeating" do
+        assert @event.repeats?
+        puts "num occ #{@event.occurrences.size}"
+      end
+      
+      should "should exist on the first monday some wednesday and much later on friday" do
+        occurrences = EventOccurrence.for_range( MARCH, MAY )
+
+        { 0 => APRIL_13,
+          4 => WED_APR_22,
+          8 => FRI_MAY_1  
+        }.each do |occurence, date|
+          start_date =   @event.occurrences[occurence].start_at.to_date()
+          assert start_date == date,
+                 "#{occurence} occurence #{start_date.strftime('%m/%d/%y')} didn't match #{date.strftime( '%m/%d/%y')}"
+        end
+      
+      end
+    end # m w f
   end
   
   context "Event repeating constants" do
