@@ -113,7 +113,5 @@ class EventOccurrence < ActiveRecord::Base
     Runt::DateRange.new(pday(start_at), pday(end_at))
   end
   
-  def self.monthly date
-    Runt::DIMonth.new(date.week_of_month, date.wday) 
-  end
+
 end
