@@ -88,12 +88,10 @@ class FixieEventsTest < ActiveSupport::TestCase
   context "Non-recurring event" do
     should "should have a single occurrence" do
       event = Event.create! :start_at => MARCH_29, :end_at => MARCH_29.advance( :hours => 1 )
-      puts  "#{( MARCH_29 + 1.hour).strftime('%m/%d/%y')}"
       
       occurrences = EventOccurrence.for_month(MARCH)
       assert 1 == occurrences.size
       assert occurrences.first.start_at == event.start_at
-      puts  "#{occurrences.first.end_at.strftime('%m/%d/%y')} didn't match #{event.end_at.strftime( '%m/%d/%y')}"
       assert occurrences.first.end_at.to_date   == event.end_at.to_date
     end
   end
