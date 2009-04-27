@@ -5,7 +5,7 @@ class Event < ActiveRecord::Base
   after_update :update_occurrences
 
   def repeats?
-    repeat_interval.abrev != 'NONE'
+    repeat_interval and (repeat_interval.abrev != 'NONE')
   end
 
   # Given a day, create an occurrence based on this event for that particular day.

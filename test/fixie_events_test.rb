@@ -20,7 +20,7 @@ class FixieEventsTest < ActiveSupport::TestCase
 
     context "monthly event on 3rd monday until september" do
       setup do
-        @event = Event.create! :start_at => APRIL_13, :end_at => APRIL_13 + 1.hour, :repeat_interval_id => Event::WEEKLY, :events_end_at => SEPTEMBER
+        @event = Event.create! :start_at => APRIL_13, :end_at => APRIL_13.advance( :hours => 1) , :repeat_interval_id => Event::WEEKLY, :events_end_at => SEPTEMBER
       end
 
       should "should have one event per month on the 3rd Monday" do
@@ -84,13 +84,29 @@ class FixieEventsTest < ActiveSupport::TestCase
       assert( Event::WEEKLY == 6)
     end
   end
+
+  context "Non-recurring event" do
+    should "should have a single occurrence" do
+      event = Event.create! :start_at => MARCH_29, :end_at => MARCH_29.advance( :hours => 1 )
+      puts  "#{( MARCH_29 + 1.hour).strftime('%m/%d/%y')}"
+      
+      occurrences = EventOccurrence.for_month(MARCH)
+      assert 1 == occurrences.size
+      assert occurrences.first.start_at == event.start_at
+      puts  "#{occurrences.first.end_at.strftime('%m/%d/%y')} didn't match #{event.end_at.strftime( '%m/%d/%y')}"
+      assert occurrences.first.end_at.to_date   == event.end_at.to_date
+    end
+  end
   
   
   def assert_occurrence_at_date o, date
     start_date =   @event.occurrences[o].start_at.to_date()
     assert start_date == date,
            " occurrence[#{o}] #{start_date.strftime('%m/%d/%y')} didn't match #{date.strftime( '%m/%d/%y')}"
-  end    
+  end  
+  
+
+  
 end
 
 =begin
@@ -193,13 +209,5 @@ describe "Recurring Events" do
 
 end
 
-describe "Non-recurring event" do
-  it "should have a single occurrence" do
-    event = Event.create! :start_at => MARCH_29, :end_at => MARCH_29 + 1.hour
-    occurrences = EventOccurrence.for_month(MARCH)
-    occurrences.size.should == 1
-    occurrences.first.start_at.should == event.start_at
-    occurrences.first.end_at.  should == event.end_at
-  end
-end
+
 =end
