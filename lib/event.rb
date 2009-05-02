@@ -12,10 +12,10 @@ class Event < ActiveRecord::Base
   def create_occurrence_on day
     o = EventOccurrence.new
     o.event = self
-    o.start_at = day.to_time + self.start_at.hour.hours + self.start_at.min.minutes
+    o.start_at = Time.local( day.year, day.month, day.day,  self.start_at.hour, self.start_at.min )
     if self.end_at
-      o.end_at = day.to_time + self.end_at.hour.hours + self.end_at.min.minutes
-    end
+      o.end_at = Time.local( day.year, day.month, day.day,  self.end_at.hour, self.end_at.min )
+   end
 
     o.save!
     o

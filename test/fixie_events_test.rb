@@ -1,17 +1,17 @@
 require File.join( File.dirname(__FILE__), 'test_helper' )
 
 class FixieEventsTest < ActiveSupport::TestCase
-  FEB       = DateTime.new(2009, 2)
-  MARCH     = DateTime.new(2009, 3)
-  APRIL     = DateTime.new(2009, 4)
-  MARCH_29  = DateTime.new(2009, 3, 29, 19, 30)
-  APRIL_19  = DateTime.new(2009, 4, 19)
-  APRIL_13  = DateTime.new(2009, 4, 13)
-  WED_APR_22= DateTime.new(2009, 4, 22)
-  MAY       = DateTime.new(2009, 5)
-  FRI_MAY_1 = DateTime.new(2009, 5, 1)
-  SEPTEMBER = DateTime.new(2009, 9, 30)
-  OCTOBER   = DateTime.new(2009, 10)
+  FEB       = Time.local(2009, 2)
+  MARCH     = Time.local(2009, 3)
+  APRIL     = Time.local(2009, 4)
+  MARCH_29  = Time.local(2009, 3, 29, 19, 30)
+  APRIL_19  = Time.local(2009, 4, 19)
+  APRIL_13  = Time.local(2009, 4, 13)
+  WED_APR_22= Time.local(2009, 4, 22)
+  MAY       = Time.local(2009, 5)
+  FRI_MAY_1 = Time.local(2009, 5, 1)
+  SEPTEMBER = Time.local(2009, 9, 30)
+  OCTOBER   = Time.local(2009, 10)
 
   context "Recurring Events" do
     setup do
@@ -20,7 +20,7 @@ class FixieEventsTest < ActiveSupport::TestCase
 
     context "monthly event on 3rd monday until september" do
       setup do
-        @event = Event.create! :start_at => APRIL_13, :end_at => APRIL_13.advance( :hours => 1) , :repeat_interval_id => Event::WEEKLY, :events_end_at => SEPTEMBER
+        @event = Event.create! :start_at => APRIL_13, :end_at => APRIL_13, :repeat_interval_id => Event::WEEKLY, :events_end_at => SEPTEMBER
       end
 
       should "should have one event per month on the 3rd Monday" do
@@ -28,13 +28,14 @@ class FixieEventsTest < ActiveSupport::TestCase
         while month <= SEPTEMBER
           occurrences = EventOccurrence.for_month(month)
           assert ( 3 <= occurrences.size  or  5 >= occurrences.size )   
-          month = month >> 1
+          month = month.advance :months => 1
         end
         
-        { 1 => DateTime.new(2009, 4, 20),
-          5 => DateTime.new(2009, 5, 18),
-          9 => DateTime.new(2009, 6, 15)
+        { 1 => Time.local(2009, 4, 20),
+          5 => Time.local(2009, 5, 18),
+          9 => Time.local(2009, 6, 15)
         }.each do |occurrence_id, date|
+          #puts "->llll -#{occurrence_id}- #{APRIL_13.hour } <-> #{APRIL_13.advance( :hours => 1).hour} <-> #{@event.occurrences[occurrence_id].start_at.hour}"
           assert_occurrence_at_date occurrence_id, date
         end
         
@@ -52,7 +53,7 @@ class FixieEventsTest < ActiveSupport::TestCase
   
     context "mon wed fri " do
       setup do
-        @event = Event.create! :start_at => APRIL_13, :end_at => APRIL_13 + 1.hour, :repeat_interval_id => Event::MON_WED_FRI, :events_end_at => MAY
+        @event = Event.create! :start_at => APRIL_13, :end_at => APRIL_13.advance( :hours => 1 ), :repeat_interval_id => Event::MON_WED_FRI, :events_end_at => MAY
       end
       
       should "be repeating" do
@@ -90,20 +91,65 @@ class FixieEventsTest < ActiveSupport::TestCase
       event = Event.create! :start_at => MARCH_29, :end_at => MARCH_29.advance( :hours => 1 )
       
       occurrences = EventOccurrence.for_month(MARCH)
-      assert 1 == occurrences.size
-      assert occurrences.first.start_at == event.start_at
-      assert occurrences.first.end_at.to_date   == event.end_at.to_date
+      assert 1 == occurrences.size, " #{occurrences.size} should have been 1"
+      assert occurrences.first.start_at == event.start_at, "s #{occurrences.first.start_at} == #{event.start_at}"
+      assert occurrences.first.end_at   == event.end_at,   "e #{occurrences.first.end_at} == #{event.end_at}"
     end
   end
   
   
-  def assert_occurrence_at_date o, date
-    start_date =   @event.occurrences[o].start_at.to_date()
+  def assert_occurrence_at_date o, date, occurrences = nil
+    occurrences ||= @event.occurrences
+    start_date = occurrences[o].start_at
     assert start_date == date,
-           " occurrence[#{o}] #{start_date.strftime('%m/%d/%y')} didn't match #{date.strftime( '%m/%d/%y')}"
+           " start occurrence[#{o}] #{start_date.class}-#{start_date.strftime( '%m/%d/%y %H:%M:%S %z')} didn't match #{date.class} #{date.strftime( '%m/%d/%y %H:%M:%S %z')} "
   end  
+  alias :assert_occurrence_at_start_date :assert_occurrence_at_date 
   
+  def assert_occurrence_at_end_date o, date, occurrences = nil
+    occurrences ||= @event.occurrences
+    end_date =  occurrences[o].end_at
+    assert end_date == date,
+           " end occurrence[#{o}] #{end_date.strftime('%m/%d/%y %H:%M')} didn't match #{date.strftime( '%m/%d/%y %H:%M')}"
+  end
+  context "Weekly event starting in march without end" do
+    setup do
+      @event = Event.create! :start_at => MARCH_29, :end_at => MARCH_29.advance( :hours => 1 ), :repeat_interval_id => Event::WEEKLY
+      @april = EventOccurrence.for_month(APRIL)
+    end
 
+    should "should have four events in april" do
+      EventOccurrence.for_month(APRIL).size == 4
+    end
+    
+    should "should have one event if ranged for one day" do
+      assert EventOccurrence.for_range(MARCH_29, MARCH_29.advance( :day => 1 ) ).size == 1
+    end
+    
+    should "should have 52 events if ranged for a year" do
+      assert EventOccurrence.for_range(MARCH_29, MARCH_29.advance( :weeks => 52 ) ).size == 52 + 1
+    end
+  
+    should "the created occurrences should be attached to the event, and have the same times for starting and ending" do
+      { 0, { :start_at => Time.local(2009, 4,  5, 19, 30),
+             :end_at   => Time.local(2009, 4,  5, 20, 30)},
+                                                    
+        1, { :start_at => Time.local(2009, 4, 12, 19, 30),
+             :end_at   => Time.local(2009, 4, 12, 20, 30) },
+                                                
+        2, { :start_at => Time.local(2009, 4, 19, 19, 30),
+             :end_at   => Time.local(2009, 4, 19, 20, 30) },
+                                                    
+        3, { :start_at => Time.local(2009, 4, 26, 19, 30),
+             :end_at   => Time.local(2009, 4, 26, 20, 30) }
+      }.each do |occurrence_id, date_range |
+        assert_occurrence_at_start_date occurrence_id, date_range[:start_at], @april
+        assert_occurrence_at_end_date   occurrence_id, date_range[:end_at  ], @april
+      
+      end
+    end
+  end
+  
   
 end
 
@@ -111,36 +157,21 @@ end
 # These are left to convert
 describe "Recurring Events" do
   describe "weekly event starting in march without end" do
-    before(:each) do
-      @event = Event.create! :start_at => MARCH_29, :end_at => MARCH_29 + 1.hour, :repeat_weekly => true
-      @april = EventOccurrence.for_month(APRIL)
-    end
-
-    it "should have four events in april" do
-      EventOccurrence.for_month(APRIL).size.should == 4
-    end
-
-    it "should have one event if ranged for one day" do
-      EventOccurrence.for_range(MARCH_29, MARCH_29 + 1.day).size.should == 1
-    end
-
-    it "should have 52 events if ranged for a year" do
-      EventOccurrence.for_range(MARCH_29, MARCH_29 + 52.weeks - 1.day).size.should == 52
-    end
+   
 
     it "the created occurrences should be attached to the event, and have the same times for starting and ending" do
       april_events = EventOccurrence.for_month(APRIL)
-      april_events[0].start_at.should == DateTime.new(2009, 4,  5, 19, 30)
-      april_events[0].end_at.  should == DateTime.new(2009, 4,  5, 20, 30)
+      april_events[0].start_at.should == Time.local(2009, 4,  5, 19, 30)
+      april_events[0].end_at.  should == Time.local(2009, 4,  5, 20, 30)
 
-      april_events[1].start_at.should == DateTime.new(2009, 4, 12, 19, 30)
-      april_events[1].end_at.  should == DateTime.new(2009, 4, 12, 20, 30)
+      april_events[1].start_at.should == Time.local(2009, 4, 12, 19, 30)
+      april_events[1].end_at.  should == Time.local(2009, 4, 12, 20, 30)
 
-      april_events[2].start_at.should == DateTime.new(2009, 4, 19, 19, 30)
-      april_events[2].end_at.  should == DateTime.new(2009, 4, 19, 20, 30)
+      april_events[2].start_at.should == Time.local(2009, 4, 19, 19, 30)
+      april_events[2].end_at.  should == Time.local(2009, 4, 19, 20, 30)
 
-      april_events[3].start_at.should == DateTime.new(2009, 4, 26, 19, 30)
-      april_events[3].end_at.  should == DateTime.new(2009, 4, 26, 20, 30)
+      april_events[3].start_at.should == Time.local(2009, 4, 26, 19, 30)
+      april_events[3].end_at.  should == Time.local(2009, 4, 26, 20, 30)
     end
 
     it "shouldn't create new events on subsequent calls" do

@@ -43,7 +43,7 @@ class EventOccurrence < ActiveRecord::Base
 
   # Returns a flat array of all event occurrences that happen in the specified month.
   def self.for_month month
-    for_range(month, month >> 1)
+    for_range(month, month.advance( :months => 1) )
   end
 
   private
