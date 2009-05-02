@@ -6,7 +6,6 @@ require "#{File.dirname(__FILE__)}/app_root/config/environment"
 require 'test_help'
 require 'action_view/test_case' # Load additional test classes not done automatically by < Rails 2.2.2
 require 'rubygems'
-require 'runt'
 
 #allow to be run in test fold ala TextMate
 Dir["../lib/*"].each do |f|  
@@ -14,6 +13,7 @@ Dir["../lib/*"].each do |f|
 end
 
 $: << File.join(File.dirname(__FILE__), "..", "vendor", "shoulda", "lib")
+$: << File.join(File.dirname(__FILE__), "..", "lib", "runt", "lib")
 require File.join( File.dirname(__FILE__), "..", "vendor", "shoulda", "init" )
 
 # Undo changes to RAILS_ENV
