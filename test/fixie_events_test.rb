@@ -1,17 +1,17 @@
 require File.join( File.dirname(__FILE__), 'test_helper' )
 
 class FixieEventsTest < ActiveSupport::TestCase
-  FEB       = Time.local(2009, 2)
-  MARCH     = Time.local(2009, 3)
-  APRIL     = Time.local(2009, 4)
-  MARCH_29  = Time.local(2009, 3, 29, 19, 30)
-  APRIL_19  = Time.local(2009, 4, 19)
-  APRIL_13  = Time.local(2009, 4, 13)
-  WED_APR_22= Time.local(2009, 4, 22)
-  MAY       = Time.local(2009, 5)
-  FRI_MAY_1 = Time.local(2009, 5, 1)
-  SEPTEMBER = Time.local(2009, 9, 30)
-  OCTOBER   = Time.local(2009, 10)
+  FEB       = Time.utc(2009, 2)
+  MARCH     = Time.utc(2009, 3)
+  APRIL     = Time.utc(2009, 4)
+  MARCH_29  = Time.utc(2009, 3, 29, 19, 30)
+  APRIL_19  = Time.utc(2009, 4, 19)
+  APRIL_13  = Time.utc(2009, 4, 13)
+  WED_APR_22= Time.utc(2009, 4, 22)
+  MAY       = Time.utc(2009, 5)
+  FRI_MAY_1 = Time.utc(2009, 5, 1)
+  SEPTEMBER = Time.utc(2009, 9, 30)
+  OCTOBER   = Time.utc(2009, 10)
 
   context "Recurring Events" do
     setup do
@@ -31,9 +31,9 @@ class FixieEventsTest < ActiveSupport::TestCase
           month = month.advance :months => 1
         end
         
-        { 1 => Time.local(2009, 4, 20),
-          5 => Time.local(2009, 5, 18),
-          9 => Time.local(2009, 6, 15)
+        { 1 => Time.utc(2009, 4, 20),
+          5 => Time.utc(2009, 5, 18),
+          9 => Time.utc(2009, 6, 15)
         }.each do |occurrence_id, date|
           #puts "->llll -#{occurrence_id}- #{APRIL_13.hour } <-> #{APRIL_13.advance( :hours => 1).hour} <-> #{@event.occurrences[occurrence_id].start_at.hour}"
           assert_occurrence_at_date occurrence_id, date
@@ -102,7 +102,7 @@ class FixieEventsTest < ActiveSupport::TestCase
     occurrences ||= @event.occurrences
     start_date = occurrences[o].start_at
     assert start_date == date,
-           " start occurrence[#{o}] #{start_date.class}-#{start_date.strftime( '%m/%d/%y %H:%M:%S %z')} didn't match #{date.class} #{date.strftime( '%m/%d/%y %H:%M:%S %z')} "
+           " start occurrence[#{o}] #{start_date.class}-#{start_date.strftime( '%m/%d/%y %H:%M:%S %z')} didn't match #{date.class}-#{date.strftime( '%m/%d/%y %H:%M:%S %z')} "
   end  
   alias :assert_occurrence_at_start_date :assert_occurrence_at_date 
   
@@ -131,17 +131,17 @@ class FixieEventsTest < ActiveSupport::TestCase
     end
   
     should "the created occurrences should be attached to the event, and have the same times for starting and ending" do
-      { 0, { :start_at => Time.local(2009, 4,  5, 19, 30),
-             :end_at   => Time.local(2009, 4,  5, 20, 30)},
+      { 0, { :start_at => Time.utc(2009, 4,  5, 19, 30),
+             :end_at   => Time.utc(2009, 4,  5, 20, 30)},
                                                     
-        1, { :start_at => Time.local(2009, 4, 12, 19, 30),
-             :end_at   => Time.local(2009, 4, 12, 20, 30) },
+        1, { :start_at => Time.utc(2009, 4, 12, 19, 30),
+             :end_at   => Time.utc(2009, 4, 12, 20, 30) },
                                                 
-        2, { :start_at => Time.local(2009, 4, 19, 19, 30),
-             :end_at   => Time.local(2009, 4, 19, 20, 30) },
+        2, { :start_at => Time.utc(2009, 4, 19, 19, 30),
+             :end_at   => Time.utc(2009, 4, 19, 20, 30) },
                                                     
-        3, { :start_at => Time.local(2009, 4, 26, 19, 30),
-             :end_at   => Time.local(2009, 4, 26, 20, 30) }
+        3, { :start_at => Time.utc(2009, 4, 26, 19, 30),
+             :end_at   => Time.utc(2009, 4, 26, 20, 30) }
       }.each do |occurrence_id, date_range |
         assert_occurrence_at_start_date occurrence_id, date_range[:start_at], @april
         assert_occurrence_at_end_date   occurrence_id, date_range[:end_at  ], @april

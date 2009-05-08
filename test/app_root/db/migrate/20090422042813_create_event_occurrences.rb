@@ -4,8 +4,8 @@ class CreateEventOccurrences < ActiveRecord::Migration
        t.integer  :event_id
        t.string   :name
        t.datetime :start_at
-       t.time     :begin_time
-       t.time     :end_at
+       t.datetime     :begin_time
+       t.datetime     :end_at
        t.timestamps
     end
   end

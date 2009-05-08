@@ -1,26 +1,15 @@
-# TODO move out of here
-class Time
-  # Returns the number of week of the month that this is.  i.e. April 13th, 2009 is the 3rd week of April
-  def week_of_month
-    t = self.dup
-    d = t.mday
-    count = 1
-    while t.mday <= d do
-      t = t - 7.days
-      count += 1
-    end
-    count
-  end
-end
-
 class EventOccurrence < ActiveRecord::Base
   belongs_to :event
-  belongs_to :reapeat_interval
+  belongs_to :repeat_interval
 
   def self.for_range start_at, end_at
     # TODO Later, instead of looping over all events (inefficient), 
     # keep track if we've already generated occurrences for the events for 
     # that particular month.
+    
+    # Make sure we're dealing with UTC
+    start_at, end_at = start_at.to_time.utc, end_at.to_time.utc
+
     Event.all.map do |event|
       if event.repeats?
         occurrences_for_repeating_event(event, start_at, end_at)
@@ -78,10 +67,6 @@ class EventOccurrence < ActiveRecord::Base
   end
 
   # Runt Helpers below
-  def self.sugar 
-    ExpressionBuilder.new
-  end
-
   def self.pday date
     Runt::PDate.day date.year, date.month, date.day 
   end
