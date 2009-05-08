@@ -17,17 +17,6 @@ class EventOccurrence < ActiveRecord::Base
   belongs_to :event
   belongs_to :reapeat_interval
 
-=begin
-  delegate :dance_types, :to => :event
-  delegate :address_city_state, :to => :event
-  delegate :user, :to => :event
-  delegate :picture, :to => :event
-  delegate :get_picture, :to => :event
-  delegate :description, :to => :event
-  delegate :user_id, :to => :event
-  delegate :name, :to => :event
-=end
-
   def self.for_range start_at, end_at
     # TODO Later, instead of looping over all events (inefficient), 
     # keep track if we've already generated occurrences for the events for 
