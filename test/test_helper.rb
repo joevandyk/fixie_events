@@ -23,8 +23,16 @@ silence_warnings {RAILS_ENV = ENV['RAILS_ENV']}
 ActiveRecord::Migrator.migrate("#{Rails.root}/db/migrate")
 
 # Set default fixture loading properties
-#Test::Unit::TestCase.class_eval do
-  #self.use_transactional_fixtures = true
-  #self.use_instantiated_fixtures = false
-  #self.fixture_path = "#{File.dirname(__FILE__)}/fixtures"
-#end
+if Test::Unit::TestCase.respond_to?(:use_transactional_fixtures)
+  Test::Unit::TestCase.class_eval do
+    self.use_transactional_fixtures = true
+    self.use_instantiated_fixtures = false
+    self.fixture_path = "#{File.dirname(__FILE__)}/fixtures"
+  end
+else
+  ActiveSupport::TestCase.class_eval do
+    self.use_transactional_fixtures = true
+    self.use_instantiated_fixtures = false
+    self.fixture_path = "#{File.dirname(__FILE__)}/fixtures"
+  end
+end
