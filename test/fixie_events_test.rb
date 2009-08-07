@@ -123,11 +123,11 @@ class FixieEventsTest < ActiveSupport::TestCase
     end
     
     should "should have one event if ranged for one day" do
-      assert EventOccurrence.for_range(MARCH_29, MARCH_29.advance( :day => 1 ) ).size == 1
+      assert_equal 1, EventOccurrence.for_range(MARCH_29, MARCH_29.advance( :day => 1 ) ).size
     end
     
     should "should have 52 events if ranged for a year" do
-      assert EventOccurrence.for_range(MARCH_29, MARCH_29.advance( :weeks => 52 ) ).size == 52 + 1
+      assert_equal 53, EventOccurrence.for_range(MARCH_29, MARCH_29.advance( :weeks => 52 ) ).size
     end
   
     should "the created occurrences should be attached to the event, and have the same times for starting and ending" do
