@@ -131,16 +131,16 @@ class FixieEventsTest < ActiveSupport::TestCase
     end
   
     should "the created occurrences should be attached to the event, and have the same times for starting and ending" do
-      { 0, { :start_at => Time.local(2009, 4,  5, 19, 30),
+      { 0 => { :start_at => Time.local(2009, 4,  5, 19, 30),
              :end_at   => Time.local(2009, 4,  5, 20, 30)},
                                                     
-        1, { :start_at => Time.local(2009, 4, 12, 19, 30),
+        1 => { :start_at => Time.local(2009, 4, 12, 19, 30),
              :end_at   => Time.local(2009, 4, 12, 20, 30) },
                                                 
-        2, { :start_at => Time.local(2009, 4, 19, 19, 30),
+        2 => { :start_at => Time.local(2009, 4, 19, 19, 30),
              :end_at   => Time.local(2009, 4, 19, 20, 30) },
                                                     
-        3, { :start_at => Time.local(2009, 4, 26, 19, 30),
+        3 => { :start_at => Time.local(2009, 4, 26, 19, 30),
              :end_at   => Time.local(2009, 4, 26, 20, 30) }
       }.each do |occurrence_id, date_range |
         assert_occurrence_at_start_date occurrence_id, date_range[:start_at], @april
